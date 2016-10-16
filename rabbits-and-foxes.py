@@ -154,11 +154,12 @@ def second_max(Time, Var):
 
 # In[3]:
 
-R = 400  # rabbits
-F = 200  # foxes
-TimeStep = .01
+R = 400  # initial rabbits
+F = 200  # initial foxes
+TimeStep = .01 #desired timestep for odeint feed
 
 def pops(pops0, t):
+    #Returns the derivative of the rabbit and fox populations to be fed into odeint
     k1 = .015  # 1/days
     k2 = .00004  # 1/(days*foxes)
     k3 = .0004  # 1/(days*rabbits)
@@ -167,11 +168,11 @@ def pops(pops0, t):
     dydt = k3*pops0[0]*pops0[1]-k4*pops0[1]
     return [dxdt, dydt]
 
-t = np.arange(0, 600, TimeStep)
-#pops0 = [R, F]
+t = np.arange(0, 600, TimeStep) #create a timespan for odeint
 
-populations = odeint(pops, [R,F], t)
+populations = odeint(pops, [R,F], t) #run odeint
 
+#Make plot of odeint output and adust axis label's and legend settings
 plt.plot(1)
 plt.title('k3 = 0.0004')
 plt.plot(t, populations[:,0], 'b-', label='Rabbits')
@@ -181,8 +182,10 @@ plt.ylabel('Population')
 plt.legend(loc=0)
 plt.show()
 
+#runs second peak function on odeint output
 ans = second_max(t, populations[:,1])
 
+#print action
 print("The second peak of foxes occurs at %.3f days and there are %d foxes." % (ans[0], ans[1]))
 
 
@@ -207,16 +210,16 @@ k4 = .04  # 1/days
 # for loop runs multiple simulations
 for i in range(trials):
 # reset lists
-    R = [Ri]
-    F = [Fi]
-    t = [0]
+    R = [Ri]  #Resets number of Rabbits
+    F = [Fi] #Resets number of Foxes
+    t = [0] #Resets time index
     
     RDead = False # Keeps track of status of rabbit population
     FDead = False # Keeps track of status of fox population
     
 
     # while loop runs individual KMC simulations
-    while t[-1] <= 600:
+    while t[-1] <= 600: #runs until t > 600 days
 
         # Sets all rates and sums of rates to avoid inefficient calculations in every if statement
         Q = k1*R[-1] + k2*R[-1]*F[-1] + k3*R[-1]*F[-1] + k4*F[-1]
@@ -266,6 +269,7 @@ for i in range(trials):
             t.append(t[-1] + 1/Q * np.log(1/np.random.rand()))
 
         else:
+            #breaks loop when an error occurs in the while loop
             print("Error in while loop")
             break
 
@@ -277,10 +281,11 @@ for i in range(trials):
 
 # In[7]:
 
-aFPeak2 = np.array(FPeak2)
-tq75, tq25 = np.percentile(aFPeak2[:,0], [75 ,25])
-fq75, fq25 = np.percentile(aFPeak2[:,1], [75 ,25])
+aFPeak2 = np.array(FPeak2) #converts list output to an array
+tq75, tq25 = np.percentile(aFPeak2[:,0], [75 ,25]) #finds the quartiles of the time
+fq75, fq25 = np.percentile(aFPeak2[:,1], [75 ,25]) #finds the quartiles of the fox population
 
+#print output
 print("The second peak of foxes occurs, on average, at %.3f days and there are %d foxes." % (np.mean(aFPeak2[:, 0]), np.mean(aFPeak2[:, 1])))
 print("The interquartile range of the time was from %.3f to %.3f days." % (tq25, tq75))
 print("The interquartile range of the number of foxes was from %.3f to %.3f. \n" % (fq25, fq75))
