@@ -130,7 +130,8 @@
 
 # In[1]:
 
-get_ipython().magic(u'matplotlib inline')
+#get_ipython().magic(u'matplotlib inline')
+
 import numpy as np
 from matplotlib import pyplot as plt
 from scipy.integrate import odeint
@@ -164,13 +165,12 @@ def pops(pops0, t):
     k4 = .04  # 1/days
     dxdt = k1*pops0[0]-k2*pops0[0]*pops0[1]
     dydt = k3*pops0[0]*pops0[1]-k4*pops0[1]
-    ddt = [dxdt, dydt]
-    return ddt
+    return [dxdt, dydt]
 
 t = np.arange(0, 600, TimeStep)
-pops0 = [R, F]
+#pops0 = [R, F]
 
-populations = odeint(pops, pops0, t)
+populations = odeint(pops, [R,F], t)
 
 plt.plot(1)
 plt.title('k3 = 0.0004')
@@ -230,13 +230,13 @@ for i in range(trials):
         # this section checks if the populations are non-zero
         if F[-1] < 1:
             # print("All foxes disappeared after %.3f days." % (t))
-            CountFDeath = CountFDeath + 1
+            CountFDeath += 1
             FDead = True
             break
             
         elif R[-1] < 1:
             # print("All rabbits disappeared after %.3f days." % (t))
-            CountRDeath = CountRDeath + 1
+            CountRDeath += 1
             FDead = True
             break
 
@@ -268,19 +268,11 @@ for i in range(trials):
         else:
             print("Error in while loop")
             break
-            
-    # Adds that KMC run to the cumulative plot
-    plt.plot(t,R, 'b--')
-    plt.plot(t,F, 'r')
+
     
     # If neither of the populations died in a given KMC run, finds the second peak and saves it
     if FDead == False and RDead == False:
         FPeak2.append(second_max(t, np.array(F)))
-
-plt.xlabel('Time (days)')
-plt.ylabel('Population')
-plt.show()        
-print("This plot shows the individual curves of the KMC simulations.\n")
 
 
 # In[7]:
